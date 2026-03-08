@@ -1,35 +1,25 @@
 "use client";
 
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { Search, HeartPulse, Activity, BedDouble, Droplets, MapPin, ChevronRight, Menu } from "lucide-react";
+import { Search, Activity, MapPin, ChevronRight, Menu } from "lucide-react";
 import { useState } from "react";
-
-// The true 10 Coimbatore Elite Institutions mapped with realistic UI data metrics
-const HOSPITALS = [
-  { id: 'kmch', name: "KMCH", type: "Multi-Specialty", status: "Optimal", icu_available: 12, icu_total: 45, blood_units: 450, glow: "bg-emerald-200/40", map: "Avinashi Road" },
-  { id: 'psg', name: "PSG Hospitals", type: "Teaching Hospital", status: "High Load", icu_available: 4, icu_total: 60, blood_units: 820, glow: "bg-blue-200/40", map: "Peelamedu" },
-  { id: 'ganga', name: "Ganga Hospital", type: "Orthopaedics & Trauma", status: "Optimal", icu_available: 18, icu_total: 35, blood_units: 320, glow: "bg-teal-200/40", map: "Mettupalayam Road" },
-  { id: 'gknm', name: "GKNM Hospital", type: "Multi-Specialty", status: "Moderate", icu_available: 9, icu_total: 40, blood_units: 540, glow: "bg-amber-200/40", map: "Pappanaickenpalayam" },
-  { id: 'srh', name: "Sri Ramakrishna", type: "Multi-Specialty", status: "Optimal", icu_available: 15, icu_total: 50, blood_units: 610, glow: "bg-indigo-200/40", map: "Avarampalayam" },
-  { id: 'royal', name: "Royal Care", type: "Super Specialty", status: "Critical Load", icu_available: 2, icu_total: 30, blood_units: 210, glow: "bg-rose-200/40", map: "Neelambur" },
-  { id: 'gem', name: "GEM Hospital", type: "Gastroenterology", status: "Optimal", icu_available: 8, icu_total: 20, blood_units: 180, glow: "bg-cyan-200/40", map: "Ramanathapuram" },
-  { id: 'kg', name: "KG Hospital", type: "Multi-Specialty", status: "Moderate", icu_available: 6, icu_total: 25, blood_units: 390, glow: "bg-orange-200/40", map: "Arts College Road" },
-  { id: 'kongunad', name: "Kongunad", type: "Multi-Specialty", status: "Optimal", icu_available: 14, icu_total: 30, blood_units: 260, glow: "bg-pink-200/40", map: "Tatabad" },
-  { id: 'womens', name: "Women's Center", type: "Maternity", status: "Moderate", icu_available: 5, icu_total: 15, blood_units: 150, glow: "bg-violet-200/40", map: "Mettupalayam Road" },
-];
+import Link from "next/link";
+import { HOSPITALS } from "@/lib/data";
 
 export default function Home() {
   const [search, setSearch] = useState("");
 
   const filteredHospitals = HOSPITALS.filter(
-    (h) => h.name.toLowerCase().includes(search.toLowerCase()) || h.type.toLowerCase().includes(search.toLowerCase())
+    (h) => h.name.toLowerCase().includes(search.toLowerCase()) || 
+           h.type.toLowerCase().includes(search.toLowerCase()) ||
+           h.map.toLowerCase().includes(search.toLowerCase())
   );
 
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.08 },
+      transition: { staggerChildren: 0.1 },
     },
   };
 
@@ -74,20 +64,19 @@ export default function Home() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-4xl mb-20"
+          className="max-w-4xl mb-16"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-slate-200 shadow-sm text-xs font-bold uppercase tracking-wider text-slate-600 mb-6">
             <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            Coimbatore Live Network
+            Coimbatore Elite Network
           </div>
           
           <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-gradient leading-[1.05] tracking-tight mb-8">
-            Elite Care, <br /> Intelligent Routing.
+            Premium Care, <br /> Beautifully Curated.
           </h2>
           
           <p className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl leading-relaxed mb-10">
-            The master terminal bridging the top 10 Coimbatore elite institutions. 
-            Real-time telemetry across intensive care units, bio-repositories, and emergency loads.
+            Select a prestigious medical institution below to view real-time telemetry across Intensive Care, Blood Repositories, and Organ Availability.
           </p>
 
           {/* Interactive Search Bar */}
@@ -99,101 +88,67 @@ export default function Home() {
                 type="text" 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search hospitals, specialties, or locations..."
+                placeholder="Search hospitals or locations..."
                 className="flex-1 bg-transparent border-none outline-none px-4 py-3 text-slate-900 font-semibold placeholder:text-slate-400 placeholder:font-medium"
               />
             </div>
           </div>
         </motion.div>
 
-        {/* Dynamic Bento Grid of 10 Hospitals */}
+        {/* Uncongested Airbnb Style Grid */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           <AnimatePresence>
-            {filteredHospitals.map((hospital, i) => (
+            {filteredHospitals.map((hospital) => (
               <motion.div 
-                layout // Enables smooth position swapping when filtering
+                layout 
                 variants={itemVariants}
                 initial="hidden"
                 animate="show"
                 exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                 key={hospital.id} 
-                className={`group glass-panel rounded-[2rem] p-6 lg:p-8 relative overflow-hidden card-hover-fx ${
-                  i === 0 ? "md:col-span-2 lg:col-span-2 bg-gradient-to-br from-white/80 to-slate-50/20" : ""
-                }`}
               >
-                {/* Visual Flair Background */}
-                <div className={`absolute top-0 right-0 w-32 h-32 ${hospital.glow} rounded-full mix-blend-multiply blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+                <Link href={`/hospital/${hospital.id}`} className="group block relative card-hover-fx">
+                  {/* Large Edge-to-Edge Image Card */}
+                  <div className="relative h-80 w-full rounded-[2rem] overflow-hidden mb-4 shadow-sm border border-slate-100">
+                    <img 
+                      src={hospital.image} 
+                      alt={hospital.name} 
+                      loading="lazy"
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                    />
+                    
+                    {/* Status Badge overlay */}
+                    <div className="absolute top-4 right-4 glass-panel px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg">
+                       <div className={`w-2 h-2 rounded-full ${hospital.status === "Critical Load" ? "bg-rose-500" : hospital.status === "Moderate" ? "bg-amber-500" : "bg-emerald-500"} animate-pulse`} />
+                       <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">{hospital.status}</span>
+                    </div>
 
-                <div className="relative z-10 flex flex-col h-full justify-between">
-                  {/* Top Bar */}
-                  <div className="flex justify-between items-start mb-12">
-                    <div>
-                      <h3 className="font-serif text-2xl lg:text-3xl font-bold text-slate-900 mb-1">{hospital.name}</h3>
-                      <div className="flex items-center gap-1.5 text-sm font-medium text-slate-500">
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    <div className="absolute bottom-4 right-4 w-10 h-10 bg-white rounded-full text-slate-900 flex items-center justify-center translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-xl">
+                      <ChevronRight size={20} />
+                    </div>
+                  </div>
+
+                  {/* Clean Text Below */}
+                  <div className="px-2">
+                    <div className="flex justify-between items-start">
+                      <h3 className="font-serif text-2xl font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">{hospital.name}</h3>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-500">
+                      <div className="flex items-center gap-1.5 text-sm font-medium">
                         <MapPin size={14} />
                         {hospital.map}
                       </div>
-                    </div>
-                    {/* Status Badge */}
-                    <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                      hospital.status === "Critical Load" ? "bg-rose-100 text-rose-700" :
-                      hospital.status === "Moderate" ? "bg-amber-100 text-amber-700" :
-                      "bg-emerald-100 text-emerald-700"
-                    }`}>
-                      {hospital.status}
+                      <span className="text-sm font-semibold text-slate-400">{hospital.type}</span>
                     </div>
                   </div>
-
-                  {/* Data Metrics */}
-                  <div className="space-y-6">
-                    {/* Specialty row */}
-                    <div>
-                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Classification</span>
-                      <p className="text-slate-700 font-semibold text-lg">{hospital.type}</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* ICU Info */}
-                      <div className="bg-slate-100/50 rounded-xl p-4 border border-slate-200/60">
-                        <div className="flex items-center justify-between mb-2">
-                          <BedDouble size={16} className="text-slate-500" />
-                          <span className="text-sm font-bold text-slate-900 tabular-nums">
-                            {hospital.icu_available} <span className="text-slate-400 font-medium">/ {hospital.icu_total}</span>
-                          </span>
-                        </div>
-                        {/* Progress Bar */}
-                        <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
-                          <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(hospital.icu_available / hospital.icu_total) * 100}%` }}
-                            transition={{ duration: 1.5, ease: "easeOut", delay: 0.2 }}
-                            className={`h-full rounded-full ${hospital.icu_available < 5 ? "bg-rose-500" : "bg-emerald-500"}`}
-                          />
-                        </div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-2">Available ICU Beds</p>
-                      </div>
-
-                      {/* Blood Info */}
-                      <div className="bg-slate-100/50 rounded-xl p-4 border border-slate-200/60 flex flex-col justify-center">
-                        <div className="flex items-center gap-2 text-rose-500 mb-1">
-                          <Droplets size={16} />
-                          <span className="text-xl font-bold tabular-nums text-slate-900 tracking-tight">{hospital.blood_units}</span>
-                        </div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Blood Units</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Subtle Hover Arrow */}
-                <div className="absolute bottom-6 right-6 w-10 h-10 bg-slate-900 rounded-full text-white flex items-center justify-center translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 shadow-lg">
-                  <ChevronRight size={20} />
-                </div>
+                </Link>
               </motion.div>
             ))}
           </AnimatePresence>
