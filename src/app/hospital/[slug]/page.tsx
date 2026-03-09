@@ -35,238 +35,271 @@ export default function HospitalPortfolio() {
 
   const staggerContainer: Variants = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+    show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
   };
 
-  // Helper macro components
-  const ProgressRing = ({ available, total, title, icon: Icon, colorClass }: any) => {
+  // Sleek Progress Ring Macro Widget
+  const ProgressRing = ({ available, total, title, icon: Icon }: any) => {
     const percentage = Math.round((available / total) * 100) || 0;
     const isCritical = percentage < 20;
-    const strokeClass = isCritical ? "stroke-rose-500" : "stroke-emerald-500";
-    const bgClass = isCritical ? "bg-rose-50" : "bg-emerald-50";
-    const textClass = isCritical ? "text-rose-600" : "text-emerald-700";
 
     return (
-      <div className={`flex flex-col items-center justify-center p-6 glass-panel rounded-3xl border border-slate-100 shadow-sm card-hover-fx ${colorClass || ""}`}>
-        <div className="relative w-24 h-24 mb-4 flex items-center justify-center">
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-500 flex flex-col items-center relative overflow-hidden group border border-slate-100/50">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-slate-100 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+        
+        <div className="relative w-36 h-36 mb-6 flex items-center justify-center">
           <svg className="w-full h-full transform -rotate-90 pointer-events-none" viewBox="0 0 36 36">
-            <path className="stroke-slate-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeWidth="3" />
+            <path className="stroke-slate-50" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" strokeWidth="2.5" />
             <motion.path 
               initial={{ strokeDasharray: "0, 100" }}
               animate={{ strokeDasharray: `${percentage}, 100` }}
               transition={{ duration: 1.5, ease: "easeOut" }}
-              className={strokeClass} 
+              className={isCritical ? "stroke-rose-500" : "stroke-slate-900"} 
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
               fill="none" 
-              strokeWidth="3" 
+              strokeWidth="2.5" 
+              strokeLinecap="round"
             />
           </svg>
-          <div className="absolute flex flex-col items-center justify-center text-slate-900">
-            <Icon size={20} className={isCritical ? "text-rose-500" : "text-emerald-500"} />
+          <div className="absolute flex flex-col items-center justify-center mt-1">
+            <span className={`text-4xl font-bold tracking-tighter leading-none ${isCritical ? 'text-rose-500' : 'text-slate-900'}`}>{available}</span>
+            <span className="text-xs font-semibold text-slate-400 mt-1">/ {total}</span>
           </div>
         </div>
-        <div className="text-center">
-          <h4 className="text-2xl font-bold tabular-nums text-slate-900 leading-none mb-1">{available}</h4>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">/ {total} Total</p>
-          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${bgClass} ${textClass}`}>
-            {title}
-          </span>
+        
+        <div className="flex items-center gap-2 mb-3">
+          <Icon size={18} className="text-slate-400" />
+          <h4 className="font-semibold text-slate-900 text-lg">{title}</h4>
+        </div>
+        
+        <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest ${isCritical ? 'bg-rose-50 text-rose-600' : 'bg-slate-50 text-slate-500'}`}>
+          {isCritical ? 'Critical Load' : 'Optimal Capacity'}
+        </span>
+      </div>
+    );
+  };
+
+  // Sleek Horizontal Blood Row
+  const BloodRow = ({ type, units, max = 300 }: { type: string, units: number, max?: number }) => {
+    const isLow = units < 25;
+    const percentage = Math.min((units / max) * 100, 100);
+    
+    return (
+      <div className="flex items-center gap-5 group">
+        <div className="w-12 font-bold text-slate-900 text-lg tracking-tight tabular-nums flex-shrink-0">{type}</div>
+        <div className="flex-1 h-2.5 bg-slate-50 rounded-full overflow-hidden relative">
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ duration: 1.2, delay: 0.2, ease: "easeOut" }}
+            className={`absolute top-0 left-0 h-full rounded-full ${isLow ? 'bg-rose-500' : 'bg-slate-900'}`}
+          />
+        </div>
+        <div className={`w-16 text-right font-bold tabular-nums tracking-tight ${isLow ? 'text-rose-500' : 'text-slate-500'}`}>
+           {units} <span className="text-xs font-semibold opacity-60">u</span>
         </div>
       </div>
     );
   };
 
-  const BloodCard = ({ type, units }: { type: string, units: number }) => (
-    <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(15,23,42,0.03)] flex flex-col justify-between hover:-translate-y-1 transition-transform">
-      <div className="flex justify-between items-start mb-6">
-        <span className="text-sm font-bold text-slate-500 uppercase">{type}</span>
-        <Droplets size={16} className={units < 20 ? "text-rose-500" : "text-slate-400"} />
+  // Sleek Organ Pill
+  const OrganPill = ({ type, count }: { type: string, count: number }) => {
+    const isAvailable = count > 0;
+    return (
+      <div className={`p-6 rounded-[2rem] border transition-colors duration-300 ${isAvailable ? 'border-indigo-100 bg-indigo-50/30' : 'border-slate-100 bg-slate-50/50'}`}>
+         <h4 className="text-sm font-semibold text-slate-500 mb-3">{type}</h4>
+         <div className="flex items-baseline gap-2">
+           <span className={`text-4xl font-bold tracking-tighter leading-none ${isAvailable ? 'text-indigo-600' : 'text-slate-300'}`}>{count}</span>
+           {isAvailable && <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-400">Ready</span>}
+         </div>
       </div>
-      <div>
-        <span className="text-3xl font-bold tabular-nums text-slate-900">{units}</span>
-        <span className="text-xs text-slate-400 font-medium ml-1">units</span>
-      </div>
-    </div>
-  );
-
-  const OrganCard = ({ type, count }: { type: string, count: number }) => (
-    <div className="glass-panel p-5 rounded-2xl flex items-center justify-between border border-white">
-      <div className="flex items-center gap-4">
-        <div className={`w-12 h-12 rounded-[1rem] flex items-center justify-center shadow-sm ${count > 0 ? "bg-blue-50 text-blue-600" : "bg-slate-100 text-slate-400"}`}>
-          <Heart size={20} />
-        </div>
-        <div>
-          <h5 className="font-bold text-slate-900 text-lg">{type}</h5>
-          <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">{count > 0 ? 'Ready for transport' : 'Unavailable'}</p>
-        </div>
-      </div>
-      <div className="text-3xl font-bold tabular-nums text-slate-900">{count}</div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-rose-200">
+    <main className="min-h-screen bg-slate-50 text-slate-900 selection:bg-rose-200 font-sans">
       
-      {/* Immersive Hero Header */}
-      <div className="relative h-[60vh] min-h-[500px] w-full bg-slate-900 flex flex-col overflow-hidden">
-        {/* Absolute Background Image */}
+      {/* Immersive Hero Header - Kept clean and majestic */}
+      <div className="relative h-[65vh] min-h-[550px] w-full bg-slate-900 flex flex-col overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image src={hospital.image} alt={hospital.name} fill className="object-cover opacity-60" priority />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-900/20" />
         </div>
 
-        {/* Global Navigation Override */}
         <nav className="relative z-20 w-full max-w-7xl mx-auto px-6 py-8 flex justify-between items-center text-white">
-          <Link href="/" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-wider hover:text-blue-300 transition-colors">
-             <div className="p-2 glass-panel border border-white/20 rounded-full group-hover:-translate-x-1 transition-transform">
+          <Link href="/" className="group flex items-center gap-3 text-xs font-bold uppercase tracking-widest hover:text-white/80 transition-colors">
+             <div className="p-2.5 bg-white/10 backdrop-blur-md rounded-full group-hover:-translate-x-1 transition-transform border border-white/10">
                <ChevronLeft size={16} />
              </div>
              Back to Terminal
           </Link>
-          <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-            <Activity size={16} className="text-emerald-400" />
-            <span className="text-xs font-bold uppercase tracking-wider">Live Telemetry Active</span>
+          <div className="flex items-center gap-2.5 bg-black/20 backdrop-blur-md px-5 py-2.5 rounded-full border border-white/10">
+            <Activity size={16} className="text-emerald-400 animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-white/90">Live Telemetry Active</span>
           </div>
         </nav>
 
-        {/* Hero Content */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-20 max-w-7xl mx-auto px-6 mt-auto pb-16 w-full"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-20 max-w-7xl mx-auto px-6 mt-auto pb-20 w-full"
         >
-          <div className="flex items-center gap-3 mb-4">
-            <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+          <div className="flex items-center gap-4 mb-6">
+            <span className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest ${
               hospital.status === "Critical Load" ? "bg-rose-500 text-white" : "bg-emerald-500 text-white"
-            } shadow-lg`}>
+            } shadow-lg shadow-${hospital.color}-500/20`}>
               {hospital.status}
             </span>
-            <span className="text-white/80 font-medium text-sm border-l border-white/20 pl-3">{hospital.type}</span>
+            <span className="text-white/70 font-semibold text-sm tracking-wide">{hospital.type}</span>
           </div>
           
-          <h1 className="font-serif text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">
+          <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 tracking-tight leading-[1.1]">
             {hospital.name}
           </h1>
           
-          <div className="flex items-center gap-6 text-white/80">
-            <div className="flex items-center gap-2">
-              <MapPin size={18} />
-              <span className="font-medium text-lg">{hospital.map}</span>
+          <div className="flex items-center gap-8 text-white/80">
+            <div className="flex items-center gap-2.5 bg-white/5 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/10">
+              <MapPin size={18} className="text-white/60" />
+              <span className="font-medium text-sm">{hospital.map}</span>
             </div>
-            <button className="flex items-center gap-2 text-sm font-bold hover:text-white transition-colors">
-               <Navigation size={16} /> Get Directions
+            <button className="flex items-center gap-2 text-sm font-bold hover:text-white transition-colors group">
+               <Navigation size={16} className="group-hover:translate-x-1 transition-transform" /> 
+               Get Directions
             </button>
           </div>
         </motion.div>
       </div>
 
-      {/* Main Dashboard Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-24 -mt-8 relative z-30">
+      {/* Main Dashboard - Redesigned for Absolute Premium Sleekness */}
+      <div className="max-w-7xl mx-auto px-6 pb-32 -mt-10 relative z-30">
         
         <motion.div 
           variants={staggerContainer}
           initial="hidden"
           animate="show"
-          className="space-y-10"
+          className="space-y-12"
         >
-          {/* Section 1: Intensive & Ward Availability */}
+          {/* Section 1: Ward Availability (Sleek Macro Rings) */}
           <motion.section variants={fadeUp}>
-            <div className="flex items-center justify-between mb-6 pt-10">
-              <h2 className="font-serif text-3xl font-bold text-slate-900 tracking-tight">Ward Availability</h2>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Updated {hospital.last_updated}</span>
+            <div className="flex items-center justify-between mb-8 px-2">
+              <h2 className="font-serif text-4xl font-bold text-slate-900 tracking-tight">Ward Availability</h2>
+              <div className="flex items-center gap-2 text-slate-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Updated {hospital.last_updated}</span>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <ProgressRing available={hospital.wards.icu_available} total={hospital.wards.icu_total} title="ICU Beds" icon={BedDouble} colorClass={hospital.glow} />
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <ProgressRing available={hospital.wards.icu_available} total={hospital.wards.icu_total} title="ICU Beds" icon={BedDouble} />
               <ProgressRing available={hospital.wards.general_available} total={hospital.wards.general_total} title="General Wards" icon={BedDouble} />
               <ProgressRing available={hospital.wards.maternity_available} total={hospital.wards.maternity_total} title="Maternity" icon={BedDouble} />
             </div>
           </motion.section>
 
-           {/* Layout Grid for Blood & Organs */}
-           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+           {/* Layout Grid for Blood & Organs - Bento Style */}
+           <motion.section variants={fadeUp} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
-              {/* Section 2: Blood Bank */}
-              <motion.section variants={fadeUp}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center">
-                    <Droplets size={20} />
-                  </div>
-                  <h2 className="font-serif text-3xl font-bold text-slate-900 tracking-tight">Blood Repository</h2>
+              {/* Blood Bank Dashboard */}
+              <div className="bg-white rounded-[3rem] p-10 shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-slate-100/50">
+                <div className="flex items-start justify-between mb-10">
+                   <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 rounded-[1.5rem] bg-rose-50 flex items-center justify-center text-rose-500">
+                        <Droplets size={26} strokeWidth={2.5} />
+                      </div>
+                      <div>
+                        <h3 className="font-serif text-3xl font-bold text-slate-900 tracking-tight">Blood Repository</h3>
+                        <p className="text-sm font-medium text-slate-500 mt-1">Live critical typed inventory</p>
+                      </div>
+                   </div>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-3 gap-4">
-                  <BloodCard type="A+" units={hospital.blood_units.a_pos} />
-                  <BloodCard type="O+" units={hospital.blood_units.o_pos} />
-                  <BloodCard type="B+" units={hospital.blood_units.b_pos} />
-                  <BloodCard type="O-" units={hospital.blood_units.o_neg} />
-                  <BloodCard type="AB+" units={hospital.blood_units.ab_pos} />
+                
+                <div className="space-y-6">
+                   <BloodRow type="A+" units={hospital.blood_units.a_pos} />
+                   <BloodRow type="O+" units={hospital.blood_units.o_pos} />
+                   <BloodRow type="B+" units={hospital.blood_units.b_pos} />
+                   <BloodRow type="O-" units={hospital.blood_units.o_neg} max={100} />
+                   <BloodRow type="AB+" units={hospital.blood_units.ab_pos} max={150} />
                 </div>
-              </motion.section>
+              </div>
 
-              {/* Section 3: Organ Availability */}
-              <motion.section variants={fadeUp}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                    <Heart size={20} />
-                  </div>
-                  <h2 className="font-serif text-3xl font-bold text-slate-900 tracking-tight">Organ Donor Registry</h2>
-                </div>
-                <div className="space-y-4">
-                  <OrganCard type="Heart" count={hospital.organs.heart} />
-                  <OrganCard type="Liver" count={hospital.organs.liver} />
-                  <OrganCard type="Kidneys" count={hospital.organs.kidney} />
-                  <OrganCard type="Corneas" count={hospital.organs.cornea} />
-                </div>
-              </motion.section>
-
-           </div>
-
-           {/* Section 4: Historical Telemetry Visualization */}
-           <motion.section variants={fadeUp} className="mt-10">
-             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-2 border-b border-slate-200">
-                <div className="flex items-center gap-3 mb-4 md:mb-0">
-                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-md">
-                    <TrendingUp size={20} />
+              {/* Organ Donor Registry Dashboard */}
+              <div className="bg-white rounded-[3rem] p-10 shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-slate-100/50 flex flex-col">
+                <div className="flex items-center gap-5 mb-10">
+                  <div className="w-14 h-14 rounded-[1.5rem] bg-indigo-50 flex items-center justify-center text-indigo-500">
+                    <Heart size={26} strokeWidth={2.5} />
                   </div>
                   <div>
-                    <h2 className="font-serif text-2xl font-bold text-slate-900 tracking-tight">ICU Load Telemetry</h2>
-                    <p className="text-sm font-medium text-slate-500">72-Hour Historical Utilization Trend</p>
+                    <h3 className="font-serif text-3xl font-bold text-slate-900 tracking-tight">Organ Registry</h3>
+                    <p className="text-sm font-medium text-slate-500 mt-1">Immediate transport availability</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-wider">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full bg-${hospital.color}-400`} /> Current Load
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-slate-300" /> City Average
-                  </div>
-                </div>
-             </div>
 
-             <div className="glass-panel p-6 rounded-[2rem] h-96 w-full border border-slate-100">
-               <ResponsiveContainer width="100%" height="100%">
-                 <AreaChart data={MOCK_HISTORY} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                   <defs>
-                     <linearGradient id="colorLoad" x1="0" y1="0" x2="0" y2="1">
-                       <stop offset="5%" stopColor={hospital.status === "Critical Load" ? "#f43f5e" : "#10b981"} stopOpacity={0.4}/>
-                       <stop offset="95%" stopColor={hospital.status === "Critical Load" ? "#f43f5e" : "#10b981"} stopOpacity={0}/>
-                     </linearGradient>
-                     <linearGradient id="colorAvg" x1="0" y1="0" x2="0" y2="1">
-                       <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.2}/>
-                       <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
-                     </linearGradient>
-                   </defs>
-                   <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                   <Tooltip 
-                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(15,23,42,0.1)' }}
-                     itemStyle={{ fontWeight: 600, color: '#0f172a' }}
-                   />
-                   <Area type="monotone" dataKey="avg" stroke="#94a3b8" strokeWidth={2} fillOpacity={1} fill="url(#colorAvg)" />
-                   <Area type="monotone" dataKey="load" stroke={hospital.status === "Critical Load" ? "#e11d48" : "#059669"} strokeWidth={3} fillOpacity={1} fill="url(#colorLoad)" />
-                 </AreaChart>
-               </ResponsiveContainer>
+                <div className="grid grid-cols-2 gap-5 flex-1 content-start">
+                  <OrganPill type="Heart" count={hospital.organs.heart} />
+                  <OrganPill type="Liver" count={hospital.organs.liver} />
+                  <OrganPill type="Kidneys" count={hospital.organs.kidney} />
+                  <OrganPill type="Corneas" count={hospital.organs.cornea} />
+                </div>
+              </div>
+
+           </motion.section>
+
+           {/* Section 4: Historical Telemetry Visualization (Massive Premium Widget) */}
+           <motion.section variants={fadeUp}>
+             <div className="bg-white rounded-[3.5rem] p-12 shadow-[0_8px_40px_rgb(0,0,0,0.04)] border border-slate-100/50 w-full mt-4">
+               
+               <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+                  <div className="flex items-center gap-5 mb-6 md:mb-0">
+                    <div className="w-14 h-14 rounded-[1.5rem] bg-slate-900 text-white flex items-center justify-center shadow-lg shadow-slate-900/20">
+                      <TrendingUp size={26} strokeWidth={2.5} />
+                    </div>
+                    <div>
+                      <h2 className="font-serif text-4xl font-bold text-slate-900 tracking-tight leading-none mb-2">ICU Load Telemetry</h2>
+                      <p className="text-sm font-medium text-slate-500">72-Hour Historical Utilization Trend</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-6 bg-slate-50 px-5 py-3 rounded-full border border-slate-100">
+                    <div className="flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+                      <div className={`w-2.5 h-2.5 rounded-full ${hospital.status === "Critical Load" ? 'bg-rose-500' : 'bg-slate-900'}`} /> 
+                      Current Load
+                    </div>
+                    <div className="flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+                      <div className="w-2.5 h-2.5 rounded-full bg-slate-200" /> 
+                      City Average
+                    </div>
+                  </div>
+               </div>
+
+               <div className="h-[400px] w-full">
+                 <ResponsiveContainer width="100%" height="100%">
+                   <AreaChart data={MOCK_HISTORY} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                     <defs>
+                       <linearGradient id="colorLoad" x1="0" y1="0" x2="0" y2="1">
+                         <stop offset="5%" stopColor={hospital.status === "Critical Load" ? "#f43f5e" : "#0f172a"} stopOpacity={0.15}/>
+                         <stop offset="95%" stopColor={hospital.status === "Critical Load" ? "#f43f5e" : "#0f172a"} stopOpacity={0}/>
+                       </linearGradient>
+                       <linearGradient id="colorAvg" x1="0" y1="0" x2="0" y2="1">
+                         <stop offset="5%" stopColor="#e2e8f0" stopOpacity={0.4}/>
+                         <stop offset="95%" stopColor="#e2e8f0" stopOpacity={0}/>
+                       </linearGradient>
+                     </defs>
+                     <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: '#94a3b8', fontWeight: 600 }} dy={20} />
+                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 13, fill: '#94a3b8', fontWeight: 600 }} dx={-10} />
+                     <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
+                     <Tooltip 
+                       contentStyle={{ borderRadius: '24px', border: '1px solid #f1f5f9', boxShadow: '0 20px 40px rgba(15,23,42,0.08)', padding: '16px 24px' }}
+                       itemStyle={{ fontWeight: 700, color: '#0f172a', fontSize: '16px' }}
+                       labelStyle={{ color: '#64748b', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}
+                       cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                     />
+                     <Area type="monotone" dataKey="avg" stroke="#cbd5e1" strokeWidth={3} fillOpacity={1} fill="url(#colorAvg)" activeDot={{ r: 6, fill: '#cbd5e1', stroke: '#fff', strokeWidth: 3 }} />
+                     <Area type="monotone" dataKey="load" stroke={hospital.status === "Critical Load" ? "#e11d48" : "#0f172a"} strokeWidth={4} fillOpacity={1} fill="url(#colorLoad)" activeDot={{ r: 8, fill: hospital.status === "Critical Load" ? "#e11d48" : "#0f172a", stroke: '#fff', strokeWidth: 4, shadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
+                   </AreaChart>
+                 </ResponsiveContainer>
+               </div>
+               
              </div>
            </motion.section>
            
