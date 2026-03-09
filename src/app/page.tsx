@@ -49,9 +49,9 @@ export default function Home() {
           <div className="hidden md:flex items-center gap-8">
             <button className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors">Documentation</button>
             <button className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors">Emergency Protocol</button>
-            <button className="text-sm font-bold px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all shadow-[0_4px_16px_rgba(15,23,42,0.2)]">
+            <Link href="/admin/login" className="text-sm font-bold px-6 py-2.5 bg-slate-900 text-white rounded-full hover:bg-slate-800 hover:scale-105 active:scale-95 transition-all shadow-[0_4px_16px_rgba(15,23,42,0.2)]">
               Admin Portal
-            </button>
+            </Link>
           </div>
           <button className="md:hidden p-2 text-slate-500">
             <Menu size={24} />
