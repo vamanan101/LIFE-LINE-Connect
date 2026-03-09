@@ -46,12 +46,12 @@ export default function AdminDashboard() {
         </div>
       </div>
       <div className="flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button onClick={onInc} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-colors active:scale-95">
+        <motion.button whileTap={{ scale: 0.85 }} onClick={onInc} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-colors">
           <Plus size={16} strokeWidth={3} />
-        </button>
-        <button onClick={onDec} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-colors active:scale-95">
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.85 }} onClick={onDec} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center hover:bg-slate-900 hover:text-white transition-colors">
           <Minus size={16} strokeWidth={3} />
-        </button>
+        </motion.button>
       </div>
     </div>
   );
@@ -103,13 +103,16 @@ export default function AdminDashboard() {
       {/* Main Command Dashboard */}
       <main className="flex-1 p-10 overflow-y-auto">
         <motion.div 
-          initial={{ opacity: 0, scale: 0.98, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: { opacity: 0 },
+            show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
+          }}
           className="max-w-5xl mx-auto"
         >
           {/* Header */}
-          <header className="flex items-center justify-between mb-12">
+          <motion.header variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }} className="flex items-center justify-between mb-12">
             <div>
               <h2 className="font-serif text-4xl font-bold text-slate-900 tracking-tight leading-none mb-2">Capacity & Flow</h2>
               <p className="text-sm font-medium text-slate-500">Modify telemetry. Changes are instantly broadcast to dispatchers.</p>
@@ -125,12 +128,12 @@ export default function AdminDashboard() {
                 <><Activity size={18} className="animate-pulse" /> Broadcast Telemetry</>
               )}
             </button>
-          </header>
+          </motion.header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Intensive Care Unit Panel */}
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-slate-100">
+            <motion.div variants={{ hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }} className="bg-white rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-slate-100">
               <div className="flex items-center gap-4 mb-8 pb-4 border-b border-slate-100">
                 <div className="w-12 h-12 rounded-[1.2rem] bg-slate-50 text-slate-900 flex items-center justify-center shadow-sm">
                   <BedDouble size={22} />
@@ -164,10 +167,10 @@ export default function AdminDashboard() {
                   onDec={() => updateWard("maternity_available", -1)} 
                 />
               </div>
-            </div>
+            </motion.div>
 
             {/* Blood Supply Unit Panel */}
-            <div className="bg-white rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-slate-100">
+            <motion.div variants={{ hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } } }} className="bg-white rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-slate-100">
               <div className="flex items-center gap-4 mb-8 pb-4 border-b border-slate-100">
                 <div className="w-12 h-12 rounded-[1.2rem] bg-rose-50 text-rose-500 flex items-center justify-center shadow-sm">
                   <Droplets size={22} />
@@ -185,7 +188,7 @@ export default function AdminDashboard() {
                 <DataStepper label="O-" value={data.blood_units.o_neg} onInc={() => updateBlood("o_neg", 1)} onDec={() => updateBlood("o_neg", -1)} />
                 <DataStepper label="AB+" value={data.blood_units.ab_pos} onInc={() => updateBlood("ab_pos", 1)} onDec={() => updateBlood("ab_pos", -1)} />
               </div>
-            </div>
+            </motion.div>
 
           </div>
 

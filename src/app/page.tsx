@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { Search, Activity, MapPin, ChevronRight, Menu } from "lucide-react";
+import { Search, Activity, MapPin, ChevronRight, Menu, Zap, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -31,9 +31,38 @@ export default function Home() {
 
   return (
     <main className="min-h-screen relative overflow-hidden bg-slate-50 text-slate-900 pb-24">
-      {/* Background Ambient Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100/50 rounded-full blur-3xl pointer-events-none" />
+      {/* Background Ambient Glows & Parallax */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[50%] bg-blue-100/50 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-[20%] right-[-10%] w-[50%] h-[50%] bg-rose-50/50 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Floating 3D Decorator Pills */}
+      <motion.div 
+        animate={{ y: [0, -20, 0], rotate: [0, 2, 0] }} 
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="hidden lg:flex absolute top-40 right-[15%] glass-panel px-6 py-4 rounded-3xl items-center gap-4 shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/60 z-10"
+      >
+        <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center">
+          <Zap size={24} className="animate-pulse" />
+        </div>
+        <div>
+           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">System Status</div>
+           <div className="text-lg font-bold text-slate-900 leading-none">All Telemetry Online</div>
+        </div>
+      </motion.div>
+
+      <motion.div 
+        animate={{ y: [0, 25, 0], rotate: [0, -3, 0] }} 
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="hidden lg:flex absolute top-80 right-[5%] glass-panel px-6 py-4 rounded-3xl items-center gap-4 shadow-[0_20px_40px_rgba(0,0,0,0.05)] border border-white/60 z-10"
+      >
+        <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center">
+          <ShieldAlert size={24} />
+        </div>
+        <div>
+           <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Action Required</div>
+           <div className="text-lg font-bold text-slate-900 leading-none">PSG Critical Load</div>
+        </div>
+      </motion.div>
 
       {/* Navigation Layer */}
       <nav className="sticky top-0 z-50 glass-panel border-b border-white/40 mb-12">
@@ -59,41 +88,41 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        {/* Dynamic Hero Section */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-20">
+        {/* Dynamic Staggered Hero Section */}
         <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-4xl mb-16"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="max-w-4xl mb-20 md:mb-28 pt-10"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass-panel border border-slate-200 shadow-sm text-xs font-bold uppercase tracking-wider text-slate-600 mb-6">
-            <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-slate-200/60 shadow-sm text-xs font-bold uppercase tracking-widest text-slate-600 mb-8">
+            <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
             Coimbatore Elite Network
-          </div>
+          </motion.div>
           
-          <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl font-bold text-gradient leading-[1.05] tracking-tight mb-8">
+          <motion.h2 variants={itemVariants} className="font-serif text-5xl md:text-7xl lg:text-[5.5rem] font-bold text-gradient leading-[1.05] tracking-tight mb-8">
             Premium Care, <br /> Beautifully Curated.
-          </h2>
+          </motion.h2>
           
-          <p className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl leading-relaxed mb-10">
+          <motion.p variants={itemVariants} className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl leading-relaxed mb-12">
             Select a prestigious medical institution below to view real-time telemetry across Intensive Care, Blood Repositories, and Organ Availability.
-          </p>
+          </motion.p>
 
           {/* Interactive Search Bar */}
-          <div className="relative group max-w-xl">
-            <div className="absolute inset-0 bg-slate-900/5 rounded-2xl blur-xl group-focus-within:bg-blue-500/10 transition-colors duration-500" />
-            <div className="relative flex items-center glass-panel rounded-2xl p-2 pl-5 transition-shadow duration-300 group-focus-within:shadow-[0_8px_30px_rgb(0,0,0,0.08)] group-focus-within:border-blue-200">
-              <Search className="text-slate-400 group-focus-within:text-blue-500 transition-colors" size={22} />
+          <motion.div variants={itemVariants} className="relative group max-w-xl">
+            <div className="absolute inset-0 bg-slate-900/5 rounded-[2rem] blur-xl group-focus-within:bg-blue-500/10 transition-colors duration-500" />
+            <div className="relative flex items-center glass-panel rounded-[2rem] p-2 pl-6 transition-shadow duration-300 group-focus-within:shadow-[0_12px_40px_rgb(0,0,0,0.08)] group-focus-within:border-blue-200/60">
+              <Search className="text-slate-400 group-focus-within:text-blue-500 transition-colors" size={24} />
               <input 
                 type="text" 
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search hospitals or locations..."
-                className="flex-1 bg-transparent border-none outline-none px-4 py-3 text-slate-900 font-semibold placeholder:text-slate-400 placeholder:font-medium"
+                className="flex-1 bg-transparent border-none outline-none px-5 py-4 text-lg text-slate-900 font-semibold placeholder:text-slate-400 placeholder:font-medium"
               />
             </div>
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Uncongested Airbnb Style Grid */}
