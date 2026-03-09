@@ -4,6 +4,7 @@ import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Search, Activity, MapPin, ChevronRight, Menu } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { HOSPITALS } from "@/lib/data";
 
 export default function Home() {
@@ -115,11 +116,12 @@ export default function Home() {
                 <Link href={`/hospital/${hospital.id}`} className="group block relative card-hover-fx">
                   {/* Large Edge-to-Edge Image Card */}
                   <div className="relative h-80 w-full rounded-[2rem] overflow-hidden mb-4 shadow-sm border border-slate-100">
-                    <img 
+                    <Image 
                       src={hospital.image} 
                       alt={hospital.name} 
-                      loading="lazy"
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-in-out"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-in-out"
                     />
                     
                     {/* Status Badge overlay */}

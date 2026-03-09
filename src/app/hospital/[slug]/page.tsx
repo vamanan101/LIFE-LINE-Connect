@@ -3,9 +3,21 @@
 import { useParams } from "next/navigation";
 import { HOSPITALS } from "@/lib/data";
 import { notFound } from "next/navigation";
-import { motion } from "framer-motion";
-import { Activity, BedDouble, Droplets, Heart, ChevronLeft, MapPin, Navigation } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+import { Activity, BedDouble, Droplets, Heart, ChevronLeft, MapPin, Navigation, TrendingUp } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
+const MOCK_HISTORY = [
+  { time: "72h", load: 65, avg: 50 },
+  { time: "60h", load: 78, avg: 55 },
+  { time: "48h", load: 85, avg: 60 },
+  { time: "36h", load: 95, avg: 65 },
+  { time: "24h", load: 88, avg: 70 },
+  { time: "12h", load: 92, avg: 75 },
+  { time: "Now", load: 89, avg: 80 },
+];
 
 export default function HospitalPortfolio() {
   const params = useParams();
@@ -16,12 +28,12 @@ export default function HospitalPortfolio() {
   }
 
   // Animation variants
-  const fadeUp = {
+  const fadeUp: Variants = {
     hidden: { opacity: 0, y: 30 },
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
   };
 
-  const staggerContainer = {
+  const staggerContainer: Variants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
   };
@@ -99,7 +111,7 @@ export default function HospitalPortfolio() {
       <div className="relative h-[60vh] min-h-[500px] w-full bg-slate-900 flex flex-col overflow-hidden">
         {/* Absolute Background Image */}
         <div className="absolute inset-0 z-0">
-          <img src={hospital.image} alt={hospital.name} className="w-full h-full object-cover opacity-60" />
+          <Image src={hospital.image} alt={hospital.name} fill className="object-cover opacity-60" priority />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
         </div>
 
@@ -208,6 +220,55 @@ export default function HospitalPortfolio() {
               </motion.section>
 
            </div>
+
+           {/* Section 4: Historical Telemetry Visualization */}
+           <motion.section variants={fadeUp} className="mt-10">
+             <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-2 border-b border-slate-200">
+                <div className="flex items-center gap-3 mb-4 md:mb-0">
+                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-md">
+                    <TrendingUp size={20} />
+                  </div>
+                  <div>
+                    <h2 className="font-serif text-2xl font-bold text-slate-900 tracking-tight">ICU Load Telemetry</h2>
+                    <p className="text-sm font-medium text-slate-500">72-Hour Historical Utilization Trend</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-wider">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full bg-${hospital.color}-400`} /> Current Load
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-slate-300" /> City Average
+                  </div>
+                </div>
+             </div>
+
+             <div className="glass-panel p-6 rounded-[2rem] h-96 w-full border border-slate-100">
+               <ResponsiveContainer width="100%" height="100%">
+                 <AreaChart data={MOCK_HISTORY} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                   <defs>
+                     <linearGradient id="colorLoad" x1="0" y1="0" x2="0" y2="1">
+                       <stop offset="5%" stopColor={hospital.status === "Critical Load" ? "#f43f5e" : "#10b981"} stopOpacity={0.4}/>
+                       <stop offset="95%" stopColor={hospital.status === "Critical Load" ? "#f43f5e" : "#10b981"} stopOpacity={0}/>
+                     </linearGradient>
+                     <linearGradient id="colorAvg" x1="0" y1="0" x2="0" y2="1">
+                       <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.2}/>
+                       <stop offset="95%" stopColor="#94a3b8" stopOpacity={0}/>
+                     </linearGradient>
+                   </defs>
+                   <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                   <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                   <Tooltip 
+                     contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 25px rgba(15,23,42,0.1)' }}
+                     itemStyle={{ fontWeight: 600, color: '#0f172a' }}
+                   />
+                   <Area type="monotone" dataKey="avg" stroke="#94a3b8" strokeWidth={2} fillOpacity={1} fill="url(#colorAvg)" />
+                   <Area type="monotone" dataKey="load" stroke={hospital.status === "Critical Load" ? "#e11d48" : "#059669"} strokeWidth={3} fillOpacity={1} fill="url(#colorLoad)" />
+                 </AreaChart>
+               </ResponsiveContainer>
+             </div>
+           </motion.section>
            
         </motion.div>
       </div>
